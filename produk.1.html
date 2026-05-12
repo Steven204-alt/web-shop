@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMK9 FoodShop</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: #0f172a;
+  color: white;
+  transition: 0.3s;
+  transition: background 0.5s ease, color 0.5s ease;
+  transition: all 0.5s ease-in-out;
+}
+
+#cart-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: red;
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 50%;
+  font-weight: bold;
+}
+
+@keyframes cartShake {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.2) rotate(-5deg); }
+  60% { transform: scale(1.2) rotate(5deg); }
+  100% { transform: scale(1); }
+}
+
+.cart-animate {
+  animation: cartShake 0.4s ease;
+}
+
+body.light {
+  background: linear-gradient(135deg, #e2e8f0, #f8fafc);
+  color: #111;
+}
+
+body.light header {
+  background: rgba(255,255,255,0.8);
+  backdrop-filter: blur(10px);
+  color: #111;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+
+body.light .card {
+  background: #ffffff;
+  color: #111;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  transition: 0.3s;
+}
+
+body.light .card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+}
+
+body.light .cart-popup {
+  background: #ffffff;
+  color: #111;
+  box-shadow: -5px 0 20px rgba(0,0,0,0.1);
+}
+
+
+body.light #receipt {
+  background: #ffffff;
+  color: #111;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+
+body.light input,
+body.light select,
+body.light textarea {
+  background: #f1f5f9;
+  color: #111;
+}
+
+body.light button {
+  background: #ef4444;
+  color: white;
+}
+
+body.light button span.ripple {
+  background: rgba(0,0,0,0.2);
+}
+
+body.light #toast {
+  background: #16a34a;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background: #111827;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo img {
+  width: 40px;
+}
+
+.container {
+  padding: 20px;
+}
+
+.filter {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.products {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  align-items: stretch;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  background: #1e293b;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.card img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+.card-body {
+  padding: 15px;
+}
+
+#cart-count {
+  transition: 0.2s;
+}
+
+#cart-count.bump {
+  transform: scale(1.3);
+}
+
+button {
+  background: #ff4d4d;
+  border: none;
+  padding: 8px 12px;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button {
+  position: relative;
+  overflow: hidden;
+}
+
+button span.ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  animation: ripple 0.6s linear;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: gold;
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-size: 12px;
+}
+
+.discount {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: red;
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-size: 12px;
+}
+
+.price {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.new-price {
+  color: #22c55e;
+  font-weight: bold;
+}
+
+.cart-popup {
+  position: fixed;
+  right: -350px;
+  top: 0;
+  width: 320px;
+  height: 100%;
+  background: #111827;
+  padding: 20px;
+  transition: right 0.3s;
+  overflow: auto;
+}
+
+.cart-popup.active {
+  right: 0;
+}
+
+.cart-popup li {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+input, select {
+  width: 100%;
+  padding: 10px;
+  margin: 6px 0;
+  border-radius: 6px;
+  border: none;
+}
+
+#receipt {
+  margin-top: 20px;
+  background: #ffffff;
+  color: #111;
+  padding: 20px;
+  border-radius: 12px;
+  display: none;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 14px;
+}
+
+
+body:not(.light) #receipt {
+  background: #1e293b;
+  color: white;
+}
+
+.fly-img {
+  position: fixed;
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 10px;
+  pointer-events: none;
+  z-index: 9999;
+  transition: all 0.7s cubic-bezier(0.65, -0.2, 0.25, 1.2);
+}
+
+#skeleton {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.products {
+  opacity: 0;
+  transition: 0.5s;
+}
+
+.products.show {
+  opacity: 1;
+}
+
+.skeleton-card {
+  height: 220px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.2s infinite;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+
+body:not(.light) .skeleton-card {
+  background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+  background-size: 200% 100%;
+}
+
+.products {
+  display: none;
+}
+
+#toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) scale(0.8);
+  background: #22c55e;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  opacity: 0;
+  transition: 0.3s;
+}
+#toast.show {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);* {
+  transition: 
+    background 0.4s ease,
+    color 0.4s ease,
+    box-shadow 0.4s ease,
+    border 0.4s ease;
+}
+
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">
+    <img src="lagu.png">
+    <h2>FoodShop</h2>
+  </div>
+
+  
+  <div style="display:flex;gap:10px;">
+    <button id="themeBtn" onclick="toggleTheme()">🌙</button>
+    <div style="position:relative;">
+  <button id="cartBtn" onclick="toggleCart()">🛒</button>
+  <span id="cart-count">0</span>
+</div>
+  </div>
+</header>
+
+<div class="container">
+
+<div class="filter">
+  <button onclick="filterCategory('all')">Semua</button>
+  <button onclick="filterCategory('makanan')">Makanan</button>
+  <button onclick="filterCategory('minuman')">Minuman</button>
+  <input id="search" placeholder="Cari menu..." onkeyup="searchMenu()">
+</div>
+
+<div id="skeleton">
+  <div class="skeleton-card"></div>
+  <div class="skeleton-card"></div>
+  <div class="skeleton-card"></div>
+  <div class="skeleton-card"></div>
+</div>
+<div class="products">
+
+<div class="card_makanan">
+  <span class="badge">BEST SELLER</span>
+  <span class="discount">-20%</span>
+  <img src="logo.png">
+  <div class="card-body">
+    <h3>Burger</h3>
+    <p class="price">Rp 25000</p>
+    <p class="new-price">Rp 20000</p>
+    <button onclick="addToCart('Burger',20000,'logo.png')">Tambah</button>
+  </div>
+</div>
+
+<div class="card_makanan">
+  <img src="nasi goreng.png">
+  <div class="card-body">
+    <h3>Nasi Goreng</h3>
+    <p>Rp 25000</p>
+    <button onclick="addToCart('Nasi Goreng',25000,'nasi goreng.png')">Tambah</button>
+  </div>
+</div>
+
+<div class="card_makanan">
+  <img src="piza.png">
+  <div class="card-body">
+    <h3>Pizza</h3>
+    <p>Rp 35000</p>
+    <button onclick="addToCart('Pizza',35000,'piza.png')">Tambah</button>
+  </div>
+</div>
+
+<div class="card_minuman">
+  <img src="boba.png">
+  <div class="card-body">
+    <h3>Boba</h3>
+    <p>Rp 22000</p>
+    <button onclick="addToCart('Boba',22000,'boba.png')">Tambah</button>
+  </div>
+</div>
+
+<div class="card_minuman">
+  <img src="kopi.png">
+  <div class="card-body">
+    <h3>Kopi</h3>
+    <p>Rp 7000</p>
+    <button onclick="addToCart('Kopi',7000,'kopi.png')">Tambah</button>
+  </div>
+</div>
+
+<div class="card_minuman">
+  <img src="JusBuah.png">
+  <div class="card-body">
+    <h3>Jus</h3>
+    <p>Rp 10000</p>
+    <button onclick="addToCart('Jus',10000,'JusBuah.png')">Tambah</button>
+  </div>
+</div>
+
+
+
+</div>
+
+<div id="receipt"></div>
+
+</div>
+
+<div class="cart-popup" id="cart">
+  <button onclick="toggleCart()">Tutup</button>
+
+  <ul id="cart-list"></ul>
+  <h3>Total: Rp <span id="total">0</span></h3>
+
+  <form onsubmit="checkout(event)">
+    <input id="nama" placeholder="Nama" required>
+    <input id="alamat" placeholder="Alamat" required>
+    <textarea id="catatan" placeholder="Catatan (Opsional)"></textarea>
+
+    <select id="metode">
+      <option>COD</option>
+      <option>Transfer Bank</option>
+      <option>E-Wallet</option>
+    </select>
+
+    <button type="submit">Checkout</button>
+  </form>
+</div>
+
+<div id="toast"></div>
+
+<script>
+let items = [];
+let total = 0;
+
+
+function toggleTheme() {
+  document.body.classList.toggle('light');
+
+  const btn = document.getElementById('themeBtn');
+
+  if (document.body.classList.contains('light')) {
+    btn.innerText = '☀️';
+  } else {
+    btn.innerText = '🌙';
+  }
+}
+
+document.querySelectorAll("button").forEach(button => {
+  button.addEventListener("click", function (e) {
+    const ripple = document.createElement("span");
+    ripple.classList.add("ripple");
+
+    const rect = button.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+
+    ripple.style.width = ripple.style.height = size + "px";
+    ripple.style.left = e.clientX - rect.left - size / 2 + "px";
+    ripple.style.top = e.clientY - rect.top - size / 2 + "px";
+
+    button.appendChild(ripple);
+
+    setTimeout(() => {
+      ripple.remove();
+    }, 600);
+  });
+});
+
+const nomorWA = "6283193119209";
+
+function showToast(text) {
+  const toast = document.getElementById('toast');
+  toast.innerText = text;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 1500);
+}
+
+function addToCart(nama, harga, imgSrc) {
+  items.push({ nama, harga });
+  renderCart();
+  showToast(nama + " ditambahkan");
+
+  animateToCart(imgSrc);
+}
+
+function animateToCart(imgSrc) {
+  const img = document.createElement("img");
+  img.src = imgSrc;
+  img.classList.add("fly-img");
+
+  document.body.appendChild(img);
+
+  const start = event.target.closest('.card').querySelector('img').getBoundingClientRect();
+  const end = document.getElementById("cartBtn").getBoundingClientRect();
+
+  img.style.left = start.left + "px";
+  img.style.top = start.top + "px";
+
+  setTimeout(() => {
+    img.style.left = end.left + "px";
+    img.style.top = end.top + "px";
+    img.style.width = "20px";
+    img.style.height = "20px";
+    img.style.opacity = "0.5";
+  }, 10);
+
+  setTimeout(() => {
+  img.remove();
+  shakeCart(); 
+ }, 700);
+}
+
+function shakeCart() {
+  const cart = document.getElementById("cartBtn");
+
+  cart.classList.add("cart-animate");
+
+  setTimeout(() => {
+    cart.classList.remove("cart-animate");
+  }, 400);
+}
+
+function renderCart() {
+  const list = document.getElementById('cart-list');
+  list.innerHTML = '';
+  total = 0;
+
+  items.forEach((item, i) => {
+    total += item.harga;
+    list.innerHTML += `
+      <li>
+        ${item.nama} - Rp ${item.harga}
+        <button onclick="removeItem(${i})">✖</button>
+      </li>
+    `;
+  });
+
+  document.getElementById('total').innerText = total;
+  document.getElementById('cart-count').innerText = items.length;
+}
+
+function removeItem(i) {
+  items.splice(i,1);
+  renderCart();
+}
+
+function toggleCart() {
+  document.getElementById('cart').classList.toggle('active');
+}
+
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    document.getElementById("skeleton").style.display = "none";
+    const p = document.querySelector(".products");
+    p.style.display = "grid";
+    setTimeout(() => p.classList.add("show"), 50);
+  }, 1200);
+});
+
+
+function checkout(e) {
+  e.preventDefault();
+
+  if (items.length === 0) {
+    alert("Keranjang kosong");
+    return;
+  }
+
+  const nama = document.getElementById('nama').value;
+  const alamat = document.getElementById('alamat').value;
+  const metode = document.getElementById('metode').value;
+
+  const id = 'ORD-' + Date.now();
+
+  let textWA = `🛒 *PESANAN BARU - SMK9 FOODSHOP*%0A`;
+textWA += `━━━━━━━━━━━━━━━%0A`;
+textWA += `📄 ID: ${id}%0A`;
+textWA += `👤 Nama: ${nama}%0A`;
+textWA += `📍 Alamat: ${alamat}%0A`;
+textWA += `💳 Metode: ${metode}%0A`;
+textWA += `━━━━━━━━━━━━━━━%0A`;
+textWA += `📦 *Detail Pesanan:*%0A`;
+
+items.forEach((i, index) => {
+  textWA += `${index+1}. ${i.nama} - Rp ${i.harga}%0A`;
+});
+
+textWA += `━━━━━━━━━━━━━━━%0A`;
+textWA += `💰 *Total: Rp ${total}*%0A`;
+textWA += `━━━━━━━━━━━━━━━%0A`;
+textWA += `🙏 Mohon konfirmasi pesanan ya kak`;;
+
+  let html = `
+
+  <h2 style="text-align:center;">🧾 STRUK PEMBELIAN</h2>
+  <p style="text-align:center; font-size:12px;">SMK9 FoodShop</p>
+  <hr>
+
+  <p><b>ID:</b> ${id}</p>
+  <p><b>Nama:</b> ${nama}</p>
+  <p><b>Alamat:</b> ${alamat}</p>
+  <p><b>Metode:</b> ${metode}</p>
+
+  <hr>
+
+  <div id="item-list">
+`;
+
+ items.forEach(i => {
+  html += `
+    <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+      <span>${i.nama}</span>
+      <span>Rp ${i.harga}</span>
+    </div>
+  `;
+});
+
+html += `
+  </div>
+
+  <hr>
+
+  <div style="display:flex; justify-content:space-between; font-weight:bold;">
+    <span>Total</span>
+    <span>Rp ${total}</span>
+  </div>
+
+  <hr>
+
+  <p style="text-align:center; font-size:12px;">
+    Terima kasih sudah berbelanja 🙏<br>
+    Ditunggu pesanan berikutnya ❤️
+  </p>
+`;
+
+  const receipt = document.getElementById('receipt');
+  receipt.style.display = 'block';
+  receipt.innerHTML = html;
+
+
+  window.open(`https://wa.me/${nomorWA}?text=${textWA}`, '_blank');
+
+  items = [];
+  renderCart();
+
+  document.getElementById('nama').value = '';
+  document.getElementById('alamat').value = '';
+
+  toggleCart(); 
+
+document.getElementById('receipt').scrollIntoView({
+  behavior: 'smooth'
+});
+
+}
+
+function filterCategory(k) {
+  document.querySelectorAll('.card').forEach(card => {
+    card.style.display = (k==='all'||card.classList.contains(k))?'flex':'none';
+  });
+}
+
+function searchMenu() {
+  const v = document.getElementById('search').value.toLowerCase();
+  document.querySelectorAll('.card').forEach(card => {
+    card.style.display = card.innerText.toLowerCase().includes(v)?'flex':'none';
+  });
+}
+</script>
+
+</body>
+</html>
